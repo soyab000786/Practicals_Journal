@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Mechanical Keyboard RGB",
+    "category": "Electronics",
+    "price": 3499,
+    "stock": 25,
+    "inStock": true,
+    "createdAt": "2025-01-10T10:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Wireless Ergonomic Mouse",
+    "category": "Electronics",
+    "price": 1799,
+    "stock": 40,
+    "inStock": true,
+    "createdAt": "2025-01-12T11:30:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "27-inch 4K UHD Monitor",
+    "category": "Displays",
+    "price": 24999,
+    "stock": 10,
+    "inStock": true,
+    "createdAt": "2025-01-15T14:15:00.000Z"
+  },
+  {
+    "id": 4,
+    "name": "Noise Cancelling Headphones",
+    "category": "Audio",
+    "price": 7999,
+    "stock": 18,
+    "inStock": true,
+    "createdAt": "2025-01-18T09:45:00.000Z"
+  }
+]

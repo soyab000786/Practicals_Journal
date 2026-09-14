@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 01 - Functional Components, JSX & Reusability</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- React 18 & ReactDOM via CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
+      --secondary: #0ea5e9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-lg: 0 12px 24px -4px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+
+    .app-container { min-height: 100vh; display: flex; flex-direction: column; }
+    .main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; width: 100%; }
+
+    .header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      color: white;
+      padding: 2.75rem 1.5rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .header-title { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .header-subtitle { font-size: 1.05rem; color: #c7d2fe; max-width: 650px; margin: 0 auto; }
+
+    .section { margin-bottom: 3rem; }
+    .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+    .section-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+
+    .custom-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .custom-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .card-description { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.25rem; flex: 1; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); gap: 0.5rem; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 0.55rem 1.15rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid var(--border-color); }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.7rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .badge-primary { background: var(--primary-light); color: var(--primary); }
+    .badge-success { background: #d1fae5; color: #065f46; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-info { background: #e0f2fe; color: #0369a1; }
+
+    .concept-box {
+      background: #ffffff;
+      border-left: 4px solid var(--primary);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .concept-box h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 0.4rem; }
+    .concept-box p { color: var(--text-muted); font-size: 0.95rem; }
+
+    /* Interactive Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1.5rem;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 550px;
+      width: 100%;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      animation: modalSlide 0.25s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; text-align: center; font-size: 0.9rem; border-top: 1px solid #1e293b; }
+  </style>
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // 1. Reusable Functional Component: Header
+    function Header({ practicalNo, title, subtitle }) {
+      return (
+        <header className="header">
+          {practicalNo && <span className="header-badge">{practicalNo}</span>}
+          <h1 className="header-title">{title}</h1>
+          <p className="header-subtitle">{subtitle}</p>
+        </header>
+      );
+    }
+
+    // 2. Reusable Functional Component: Button
+    function Button({ children, variant = 'primary', size = 'md', onClick }) {
+      const sizeClass = size === 'sm' ? 'btn-sm' : '';
+      return (
+        <button className={`btn btn-${variant} ${sizeClass}`} onClick={onClick}>
+          {children}
+        </button>
+      );
+    }
+
+    // 3. Reusable Functional Component: Badge
+    function Badge({ text, variant = 'primary' }) {
+      return <span className={`badge badge-${variant}`}>{text}</span>;
+    }
+
+    // 4. Reusable Feature Card Component
+    function Card({ icon, title, description, category, actionLabel = "Learn More", onAction }) {
+      return (
+        <div className="custom-card">
+          <div className="card-icon" style={{ background: '#eef2ff' }}>{icon}</div>
+          <div style={{ marginBottom: '0.5rem' }}>
+            <Badge text={category} variant="primary" />
+          </div>
+          <h3 className="card-title">{title}</h3>
+          <p className="card-description">{description}</p>
+          <div className="card-footer">
+            <Button variant="primary" size="sm" onClick={onAction}>{actionLabel}</Button>
+          </div>
+        </div>
+      );
+    }
+
+    // 5. Reusable Course Card Component
+    function CourseCard({ courseCode, title, instructor, duration, level, rating, onEnroll, onViewSyllabus }) {
+      const badgeVariant = level === 'Beginner' ? 'success' : level === 'Intermediate' ? 'info' : 'warning';
+      return (
+        <div className="custom-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--primary)' }}>{courseCode}</span>
+            <Badge text={level} variant={badgeVariant} />
+          </div>
+          <h3 className="card-title">{title}</h3>
+          <div style={{ margin: '0.75rem 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+            <p>👨‍🏫 <strong>Instructor:</strong> {instructor}</p>
+            <p>⏱️ <strong>Duration:</strong> {duration}</p>
+            <p>⭐ <strong>Rating:</strong> {rating} / 5.0</p>
+          </div>
+          <div className="card-footer">
+            <Button variant="success" size="sm" onClick={() => onEnroll(title)}>🚀 Enroll</Button>
+            <Button variant="secondary" size="sm" onClick={() => onViewSyllabus({ courseCode, title, instructor, duration, level })}>📖 Syllabus</Button>
+          </div>
+        </div>
+      );
+    }
+
+    // 6. Reusable Interactive Detail Modal Component
+    function Modal({ isOpen, onClose, data, type }) {
+      if (!isOpen || !data) return null;
+
+      return (
+        <div className="modal-backdrop" onClick={onClose}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={onClose}>✕</button>
+
+            {type === 'concept' && (
+              <div>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{data.icon}</div>
+                <Badge text={data.category} variant="primary" />
+                <h2 style={{ fontSize: '1.4rem', margin: '0.75rem 0 0.5rem' }}>{data.title}</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+                  {data.fullDetails}
+                </p>
+                <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}>
+                  <strong>💻 Code Pattern:</strong>
+                  <pre style={{ color: 'var(--primary)', marginTop: '0.4rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                    {data.codeSnippet}
+                  </pre>
+                </div>
+              </div>
+            )}
+
+            {type === 'syllabus' && (
+              <div>
+                <span className="badge badge-success">{data.level} Level</span>
+                <h2 style={{ fontSize: '1.4rem', margin: '0.5rem 0' }}>{data.title}</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                  Course Code: <strong>{data.courseCode}</strong> &bull; Duration: <strong>{data.duration}</strong>
+                </p>
+                <h4 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>📚 Curriculum Modules:</h4>
+                <ul style={{ paddingLeft: '1.25rem', color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.8 }}>
+                  <li>Module 1: Foundations & Architecture Overview</li>
+                  <li>Module 2: Functional Component Composition</li>
+                  <li>Module 3: Props Validation & Destructuring</li>
+                  <li>Module 4: Reusable Component Libraries & UI Design</li>
+                </ul>
+              </div>
+            )}
+
+            {type === 'enroll' && (
+              <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🎉</div>
+                <h2 style={{ fontSize: '1.4rem', color: 'var(--success)', marginBottom: '0.5rem' }}>Enrollment Confirmed!</h2>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+                  Student <strong>Soyab Saiyad</strong> (26084231040) is successfully registered for course: <strong>{data.title}</strong>.
+                </p>
+                <Button variant="primary" onClick={onClose}>Done</Button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // 7. Footer Component
+    function Footer() {
+      return (
+        <footer className="footer">
+          <p><strong>Ganpat University</strong> &bull; Web Technology Practicals Journal &bull; Practical 01</p>
+          <p style={{ marginTop: '0.4rem', fontSize: '0.8rem', color: '#64748b' }}>
+            Submitted by: <strong>Soyab Saiyad</strong> (Enrollment: 26084231040)
+          </p>
+        </footer>
+      );
+    }
+
+    // Main App Component
+    function App() {
+      const [modalState, setModalState] = useState({ isOpen: false, data: null, type: null });
+      const [buttonDemoAction, setButtonDemoAction] = useState(null);
+
+      const coreConcepts = [
+        {
+          id: 1,
+          icon: '⚛️',
+          title: 'Functional Components',
+          description: 'JavaScript functions that accept props and return JSX. Modern, standard, and lightweight in React.',
+          category: 'React Core',
+          fullDetails: 'Functional Components are JavaScript functions that take props as an argument and return React elements. They allow developers to write clean, reusable, and easily testable code.',
+          codeSnippet: 'function UserCard({ name, role }) {\n  return <div><h3>{name}</h3><p>{role}</p></div>;\n}'
+        },
+        {
+          id: 2,
+          icon: '✨',
+          title: 'JSX Syntax',
+          description: 'JavaScript XML allowing HTML-like syntax inside JavaScript, transpiled to React.createElement() calls.',
+          category: 'Syntax',
+          fullDetails: 'JSX stands for JavaScript XML. It gives developers the ability to write HTML elements directly inside JavaScript code, creating intuitive component markup.',
+          codeSnippet: 'const element = <h1 className="title">Hello, World!</h1>;'
+        },
+        {
+          id: 3,
+          icon: '🔄',
+          title: 'Component Reusability',
+          description: 'Creating modular, isolated components (Cards, Buttons, Badges) that dynamically adapt with varying prop inputs.',
+          category: 'Architecture',
+          fullDetails: 'Component Reusability is the software engineering practice of building isolated UI blocks once and using them repeatedly with varying dynamic data across different views.',
+          codeSnippet: '<Button variant="primary">Submit</Button>\n<Button variant="danger">Delete</Button>'
+        }
+      ];
+
+      const courses = [
+        { id: 'C1', courseCode: 'REACT-101', title: 'Modern React with JSX', instructor: 'Dr. John Doe', duration: '6 Weeks', level: 'Beginner', rating: 4.8 },
+        { id: 'C2', courseCode: 'NODE-201', title: 'Backend Mastery with Express', instructor: 'Prof. Jane Smith', duration: '8 Weeks', level: 'Intermediate', rating: 4.9 },
+        { id: 'C3', courseCode: 'MERN-301', title: 'Full Stack MERN Architecture', instructor: 'Alex Rivera', duration: '12 Weeks', level: 'Advanced', rating: 4.7 }
+      ];
+
+      const openModal = (data, type) => setModalState({ isOpen: true, data, type });
+      const closeModal = () => setModalState({ isOpen: false, data: null, type: null });
+
+      const handleDemoButtonClick = (name, variant) => {
+        const time = new Date().toLocaleTimeString();
+        setButtonDemoAction({ name, variant, time });
+      };
+
+      return (
+        <div className="app-container">
+          <Header
+            practicalNo="Practical No. 01"
+            title="Functional Components, JSX & Reusability"
+            subtitle="Demonstrating React Functional Component Architecture, JSX templating, and reusable UI components"
+          />
+
+          <main className="main-content">
+            <div className="concept-box">
+              <h3>💡 Practical Objective</h3>
+              <p>
+                Build a clean React application utilizing Functional Components, JSX expressions, and modular 
+                Component Reusability. Components like <code>Button</code>, <code>Badge</code>, <code>Card</code>, 
+                and <code>CourseCard</code> are reused throughout the interface with varying props.
+              </p>
+            </div>
+
+            {/* Section 1: Reusable Concept Cards */}
+            <section className="section">
+              <h2 className="section-title"><span>🧩</span> Core React Concepts (Reusable Card Component)</h2>
+              <p className="section-desc">Click "Explore Concept" on any card to inspect code details via interactive React Modal.</p>
+              <div className="grid-3">
+                {coreConcepts.map(item => (
+                  <Card
+                    key={item.id}
+                    icon={item.icon}
+                    title={item.title}
+                    description={item.description}
+                    category={item.category}
+                    actionLabel="Explore Concept →"
+                    onAction={() => openModal(item, 'concept')}
+                  />
+                ))}
+              </div>
+            </section>
+
+            {/* Section 2: Reusable Course Cards */}
+            <section className="section">
+              <h2 className="section-title"><span>📚</span> Available Courses (Reusable CourseCard Component)</h2>
+              <p className="section-desc">Click "🚀 Enroll" to register student or "📖 Syllabus" to view course modules.</p>
+              <div className="grid-3">
+                {courses.map(course => (
+                  <CourseCard
+                    key={course.id}
+                    courseCode={course.courseCode}
+                    title={course.title}
+                    instructor={course.instructor}
+                    duration={course.duration}
+                    level={course.level}
+                    rating={course.rating}
+                    onEnroll={(title) => openModal({ title }, 'enroll')}
+                    onViewSyllabus={(courseData) => openModal(courseData, 'syllabus')}
+                  />
+                ))}
+              </div>
+            </section>
+
+            {/* Section 3: Reusable Buttons & Badges */}
+            <section className="section">
+              <h2 className="section-title"><span>🎨</span> Reusable UI Buttons & Badges Showcase</h2>
+              <p className="section-desc">Click on any button below to test live prop variant rendering.</p>
+              
+              <div className="custom-card" style={{ gap: '1.25rem' }}>
+                <div>
+                  <h4 style={{ marginBottom: '0.75rem', color: 'var(--text-muted)' }}>Button Variants:</h4>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <Button variant="primary" onClick={() => handleDemoButtonClick('Primary Button', 'primary')}>Primary Button</Button>
+                    <Button variant="secondary" onClick={() => handleDemoButtonClick('Secondary Button', 'secondary')}>Secondary Button</Button>
+                    <Button variant="success" onClick={() => handleDemoButtonClick('Success Button', 'success')}>Success Button</Button>
+                    <Button variant="primary" size="sm" onClick={() => handleDemoButtonClick('Small Button', 'primary')}>Small Button</Button>
+                  </div>
+                </div>
+
+                {/* Live Button Click Status Feedback */}
+                {buttonDemoAction && (
+                  <div style={{
+                    background: '#f8fafc',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    padding: '0.75rem 1rem',
+                    fontSize: '0.88rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}>
+                    <span>⚡ <strong>Live Action:</strong> You clicked</span>
+                    <Badge text={buttonDemoAction.name} variant={buttonDemoAction.variant === 'secondary' ? 'info' : buttonDemoAction.variant} />
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>(Timestamp: {buttonDemoAction.time})</span>
+                  </div>
+                )}
+
+                <div>
+                  <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Badge Variants:</h4>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <Badge text="PRIMARY TAG" variant="primary" />
+                    <Badge text="ACTIVE STATUS" variant="success" />
+                    <Badge text="PENDING REVIEW" variant="warning" />
+                    <Badge text="INFORMATIONAL" variant="info" />
+                  </div>
+                </div>
+              </div>
+            </section>
+          </main>
+
+          {/* Interactive Modal Popup Component (Used only for Courses and Concepts) */}
+          <Modal
+            isOpen={modalState.isOpen}
+            onClose={closeModal}
+            data={modalState.data}
+            type={modalState.type}
+          />
+
+          <Footer />
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

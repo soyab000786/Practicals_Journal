@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 02 - Props, State Management & Event Handling</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- React 18 CDN + Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --primary-light: #e0f2fe;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius: 12px;
+      --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+
+    .app-container { min-height: 100vh; display: flex; flex-direction: column; }
+    .main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; width: 100%; }
+
+    .header {
+      background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
+      color: white;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+    .header-badge { display: inline-block; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 0.35rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .header-title { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .header-subtitle { font-size: 1.05rem; color: #bae6fd; max-width: 650px; margin: 0 auto; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.75rem; margin-bottom: 2rem; }
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    /* Counter */
+    .counter-box { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; padding: 1.5rem; background: #f0f9ff; border: 1px dashed var(--primary); border-radius: var(--radius); }
+    .counter-display { font-size: 3.5rem; font-weight: 800; color: var(--primary-dark); line-height: 1; }
+    .counter-controls { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
+
+    /* Buttons */
+    .btn { padding: 0.6rem 1.25rem; font-size: 0.9rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; font-family: inherit; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+
+    .form-input { width: 100%; padding: 0.65rem 0.9rem; font-size: 0.95rem; border: 1px solid var(--border-color); border-radius: 8px; outline: none; font-family: inherit; }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2,132,199,0.15); }
+
+    .task-item { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.6rem; }
+    .task-item.completed { background: #f1f5f9; opacity: 0.7; }
+    .task-item.completed .task-text { text-decoration: line-through; color: var(--text-muted); }
+
+    .user-preview { display: flex; gap: 1.25rem; align-items: center; padding: 1.25rem; border-radius: var(--radius); background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; }
+    .user-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; }
+
+    .footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; text-align: center; font-size: 0.9rem; border-top: 1px solid #1e293b; }
+  </style>
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    function Header({ title, subtitle, practicalNo }) {
+      return (
+        <header className="header">
+          {practicalNo && <span className="header-badge">{practicalNo}</span>}
+          <h1 className="header-title">{title}</h1>
+          <p className="header-subtitle">{subtitle}</p>
+        </header>
+      );
+    }
+
+    // Component 1: Counter Section
+    function CounterSection() {
+      const [count, setCount] = useState(0);
+      const [step, setStep] = useState(1);
+
+      return (
+        <div className="card">
+          <h3 className="card-title"><span>🔢</span> Interactive Counter (State & Click Events)</h3>
+          <p className="card-subtitle">Demonstrates React <code>useState</code>, numeric updates, and <code>onClick</code> handlers.</p>
+          <div className="counter-box">
+            <div className="counter-display">{count}</div>
+            <div style={{ width: '100%', maxWidth: '200px' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>Step Value:</label>
+              <input
+                type="number"
+                min="1"
+                value={step}
+                onChange={(e) => setStep(Math.max(1, parseInt(e.target.value) || 1))}
+                className="form-input"
+                style={{ textAlign: 'center', marginTop: '0.25rem' }}
+              />
+            </div>
+            <div className="counter-controls">
+              <button className="btn btn-primary" onClick={() => setCount(c => c + Number(step))}>+{step} Increment</button>
+              <button className="btn btn-danger" onClick={() => setCount(c => Math.max(0, c - Number(step)))}>-{step} Decrement</button>
+              <button className="btn btn-warning" onClick={() => setCount(c => c * 2)}>✖ 2 Double</button>
+              <button className="btn btn-outline" onClick={() => setCount(0)}>↺ Reset</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Component 2: Task Manager
+    function TaskManager() {
+      const [tasks, setTasks] = useState([
+        { id: 1, text: 'Learn React Props & Component Hierarchy', completed: true },
+        { id: 2, text: 'Master useState hook and updates', completed: false },
+        { id: 3, text: 'Handle Synthetic Events in React', completed: false }
+      ]);
+      const [inputTask, setInputTask] = useState('');
+      const [filter, setFilter] = useState('all');
+
+      const handleAdd = (e) => {
+        e.preventDefault();
+        if (!inputTask.trim()) return;
+        setTasks([{ id: Date.now(), text: inputTask.trim(), completed: false }, ...tasks]);
+        setInputTask('');
+      };
+
+      const handleToggle = (id) => {
+        setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+      };
+
+      const handleDelete = (id) => {
+        setTasks(tasks.filter(t => t.id !== id));
+      };
+
+      const filtered = tasks.filter(t => filter === 'active' ? !t.completed : filter === 'completed' ? t.completed : true);
+
+      return (
+        <div className="card">
+          <h3 className="card-title"><span>📝</span> Task Manager (List State & Callbacks)</h3>
+          <p className="card-subtitle">Demonstrates parent-child state synchronization and callback prop patterns.</p>
+          
+          <form onSubmit={handleAdd} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
+            <input
+              type="text"
+              placeholder="Add new task..."
+              value={inputTask}
+              onChange={(e) => setInputTask(e.target.value)}
+              className="form-input"
+            />
+            <button type="submit" className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>➕ Add</button>
+          </form>
+
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+            <button className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setFilter('all')}>All ({tasks.length})</button>
+            <button className={`btn btn-sm ${filter === 'active' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setFilter('active')}>Active ({tasks.filter(t => !t.completed).length})</button>
+            <button className={`btn btn-sm ${filter === 'completed' ? 'btn-primary' : 'btn-outline'}`} onClick={() => setFilter('completed')}>Completed ({tasks.filter(t => t.completed).length})</button>
+          </div>
+
+          <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+            {filtered.map(t => (
+              <div key={t.id} className={`task-item ${t.completed ? 'completed' : ''}`}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={t.completed} onChange={() => handleToggle(t.id)} />
+                  <span className="task-text">{t.text}</span>
+                </label>
+                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(t.id)}>🗑️</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Component 3: Live User Profile
+    function UserProfileCard() {
+      const [profile, setProfile] = useState({
+        name: 'Soyab Saiyad',
+        role: 'Full Stack Engineer',
+        location: 'Ahmedabad, India',
+        available: true
+      });
+
+      return (
+        <div className="card">
+          <h3 className="card-title"><span>👤</span> Live User Profile (Object State & Change Events)</h3>
+          <p className="card-subtitle">Type in inputs below to see instant 2-way state reflection.</p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+            <div>
+              <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Name:</label>
+              <input type="text" value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} className="form-input" />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Role:</label>
+              <input type="text" value={profile.role} onChange={(e) => setProfile({ ...profile, role: e.target.value })} className="form-input" />
+            </div>
+          </div>
+
+          <div className="user-preview">
+            <div className="user-avatar">{profile.name ? profile.name.charAt(0).toUpperCase() : '?'}</div>
+            <div>
+              <h4 style={{ fontSize: '1.15rem', fontWeight: 700 }}>{profile.name}</h4>
+              <p style={{ color: 'var(--primary-dark)', fontWeight: 600, fontSize: '0.9rem' }}>{profile.role}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>📍 {profile.location}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Component 4: Interactive Events Box
+    function InteractiveBox() {
+      const [coords, setCoords] = useState({ x: 0, y: 0 });
+      const [lastKey, setLastKey] = useState('None');
+
+      return (
+        <div className="card">
+          <h3 className="card-title"><span>⚡</span> Mouse & Keyboard Events</h3>
+          <p className="card-subtitle">Move mouse inside the box or type inside the input.</p>
+
+          <div
+            onMouseMove={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              setCoords({ x: Math.round(e.clientX - r.left), y: Math.round(e.clientY - r.top) });
+            }}
+            style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
+              color: 'white',
+              borderRadius: '10px',
+              padding: '1.5rem',
+              textAlign: 'center',
+              cursor: 'crosshair',
+              marginBottom: '1rem'
+            }}
+          >
+            <h4>Interactive Mouse Area</h4>
+            <p style={{ marginTop: '0.4rem', fontSize: '0.9rem' }}>Cursor: <strong>X: {coords.x}px | Y: {coords.y}px</strong></p>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Keyboard Event Tester:</label>
+            <input
+              type="text"
+              placeholder="Press any key here..."
+              onKeyDown={(e) => setLastKey(`${e.key} (${e.code})`)}
+              className="form-input"
+              style={{ marginTop: '0.25rem' }}
+            />
+            <p style={{ marginTop: '0.35rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Detected Key: <strong style={{ color: 'var(--primary-dark)' }}>{lastKey}</strong>
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <div className="app-container">
+          <Header
+            practicalNo="Practical No. 02"
+            title="Props, State Management & Event Handling"
+            subtitle="Demonstrating React Props, useState hook, and Synthetic Events (onClick, onChange, onKeyDown)"
+          />
+          <main className="main-content">
+            <div className="grid-2">
+              <CounterSection />
+              <TaskManager />
+            </div>
+            <div className="grid-2">
+              <UserProfileCard />
+              <InteractiveBox />
+            </div>
+          </main>
+          <footer className="footer">
+            <p><strong>Web Technology Practicals Journal</strong> &bull; Practical 02</p>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

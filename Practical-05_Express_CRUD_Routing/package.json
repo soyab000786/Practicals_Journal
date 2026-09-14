@@ -1,0 +1,15 @@
+{
+  "name": "practical-05-express-crud-routing",
+  "version": "1.0.0",
+  "description": "Express.js Backend Server with Modular Routing and CRUD Operations",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}

@@ -1,0 +1,52 @@
+### ====================================================
+### Practical 07: Employee Management MongoDB Atlas API Tests
+### ====================================================
+
+### 1. Server Health Check
+GET http://localhost:5000/
+
+### 2. Get All Employees (With Pagination)
+GET http://localhost:5000/api/employees?page=1&limit=10
+
+### 3. Filter Employees by Department (Engineering)
+GET http://localhost:5000/api/employees?department=Engineering
+
+### 4. Filter by Salary Range (Salary >= 70000)
+GET http://localhost:5000/api/employees?minSalary=70000
+
+### 5. Search by Name or Role (Lead)
+GET http://localhost:5000/api/employees?search=Lead
+
+### 6. Get Employee by Custom empId (EMP101)
+GET http://localhost:5000/api/employees/EMP101
+
+### 7. Create New Employee (POST)
+POST http://localhost:5000/api/employees
+Content-Type: application/json
+
+{
+  "empId": "EMP106",
+  "firstName": "Neha",
+  "lastName": "Kapoor",
+  "email": "neha.kapoor@company.com",
+  "phone": "9812300099",
+  "department": "Engineering",
+  "designation": "Frontend React Specialist",
+  "salary": 78000,
+  "status": "Active"
+}
+
+### 8. Update Employee Details (PUT)
+PUT http://localhost:5000/api/employees/EMP106
+Content-Type: application/json
+
+{
+  "designation": "Senior Frontend Architect",
+  "salary": 88000
+}
+
+### 9. Get Department Analytics & Metrics (MongoDB Aggregation)
+GET http://localhost:5000/api/employees/stats/summary
+
+### 10. Delete Employee (DELETE)
+DELETE http://localhost:5000/api/employees/EMP106

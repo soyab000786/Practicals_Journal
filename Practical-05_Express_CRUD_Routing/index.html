@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 05 - Express.js Routing & CRUD API</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius: 12px;
+      --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+    .header { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); color: white; padding: 2.5rem 1.5rem; text-align: center; }
+    .header-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.35rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .header-title { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .header-subtitle { font-size: 1.05rem; color: #c7d2fe; max-width: 650px; margin: 0 auto; }
+
+    .main-content { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    .endpoint-item { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.6rem; }
+    .method { font-family: 'Fira Code', monospace; font-weight: 700; font-size: 0.78rem; padding: 0.2rem 0.6rem; border-radius: 4px; }
+    .method-get { background: #dbeafe; color: #1e40af; }
+    .method-post { background: #dcfce7; color: #15803d; }
+    .method-put { background: #fef3c7; color: #92400e; }
+    .method-delete { background: #fee2e2; color: #991b1b; }
+
+    .btn { padding: 0.4rem 0.85rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; border: none; cursor: pointer; background: var(--primary); color: white; }
+    .btn:hover { background: #4338ca; }
+
+    .terminal { background: #0f172a; color: #38bdf8; font-family: 'Fira Code', monospace; font-size: 0.85rem; padding: 1.25rem; border-radius: 8px; max-height: 350px; overflow-y: auto; white-space: pre-wrap; }
+    .footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; text-align: center; font-size: 0.9rem; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <span class="header-badge">Practical No. 05</span>
+    <h1 class="header-title">Express.js Backend Server & CRUD Routing</h1>
+    <p class="header-subtitle">Interactive API Playground, Route Visualizer & Product CRUD Operations</p>
+  </header>
+
+  <main class="main-content">
+    
+    <div style="background: #eef2ff; border-left: 4px solid var(--primary); padding: 1.25rem; border-radius: 0 8px 8px 0; margin-bottom: 2rem;">
+      <h3 style="color: var(--primary); font-size: 1.1rem; margin-bottom: 0.3rem;">💡 How to Run the Express Server</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Open command prompt inside this folder and run: <code>node server.js</code>. The server will start on port <strong>5000</strong>.
+        You can test endpoints below directly or through Postman / cURL!
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Endpoints List -->
+      <div class="card">
+        <h3 class="card-title">📡 API Route Endpoints</h3>
+
+        <div class="endpoint-item">
+          <div>
+            <span class="method method-get">GET</span>
+            <strong style="margin-left: 0.5rem; font-size: 0.9rem;">/api/products</strong>
+          </div>
+          <button class="btn" onclick="testEndpoint('GET', 'http://localhost:5000/api/products', null, mockProducts)">Test GET All</button>
+        </div>
+
+        <div class="endpoint-item">
+          <div>
+            <span class="method method-get">GET</span>
+            <strong style="margin-left: 0.5rem; font-size: 0.9rem;">/api/products/1</strong>
+          </div>
+          <button class="btn" onclick="testEndpoint('GET', 'http://localhost:5000/api/products/1', null, mockProducts[0])">Test GET by ID</button>
+        </div>
+
+        <div class="endpoint-item">
+          <div>
+            <span class="method method-post">POST</span>
+            <strong style="margin-left: 0.5rem; font-size: 0.9rem;">/api/products</strong>
+          </div>
+          <button class="btn" onclick="testEndpoint('POST', 'http://localhost:5000/api/products', { name: 'Wireless Gaming Mouse', category: 'Electronics', price: 1999, stock: 15 }, { success: true, message: 'Product created successfully', data: { id: 5, name: 'Wireless Gaming Mouse', price: 1999 } })">Test POST</button>
+        </div>
+
+        <div class="endpoint-item">
+          <div>
+            <span class="method method-put">PUT</span>
+            <strong style="margin-left: 0.5rem; font-size: 0.9rem;">/api/products/1</strong>
+          </div>
+          <button class="btn" onclick="testEndpoint('PUT', 'http://localhost:5000/api/products/1', { name: 'Mechanical Keyboard RGB Pro', price: 3999 }, { success: true, message: 'Product updated successfully' })">Test PUT</button>
+        </div>
+
+        <div class="endpoint-item">
+          <div>
+            <span class="method method-delete">DELETE</span>
+            <strong style="margin-left: 0.5rem; font-size: 0.9rem;">/api/products/2</strong>
+          </div>
+          <button class="btn" onclick="testEndpoint('DELETE', 'http://localhost:5000/api/products/2', null, { success: true, message: 'Product ID 2 deleted successfully' })">Test DELETE</button>
+        </div>
+      </div>
+
+      <!-- Live Terminal / Response Output -->
+      <div class="card">
+        <h3 class="card-title">🖥️ Live JSON Response Console</h3>
+        <div id="outputConsole" class="terminal">// Click any "Test" button on the left to inspect HTTP Response JSON payload...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p><strong>Web Technology Practicals Journal</strong> &bull; Practical 05</p>
+  </footer>
+
+  <script>
+    const mockProducts = [
+      { id: 1, name: "Mechanical Keyboard RGB", category: "Electronics", price: 3499, stock: 25, inStock: true },
+      { id: 2, name: "Wireless Ergonomic Mouse", category: "Electronics", price: 1799, stock: 40, inStock: true },
+      { id: 3, name: "27-inch 4K UHD Monitor", category: "Displays", price: 24999, stock: 10, inStock: true },
+      { id: 4, name: "Noise Cancelling Headphones", category: "Audio", price: 7999, stock: 18, inStock: true }
+    ];
+
+    async function testEndpoint(method, url, payload, fallbackData) {
+      const consoleBox = document.getElementById('outputConsole');
+      consoleBox.innerText = `Connecting to Express Server: [${method}] ${url}...\n`;
+
+      try {
+        const options = { method, headers: { 'Content-Type': 'application/json' } };
+        if (payload) options.body = JSON.stringify(payload);
+        
+        const res = await fetch(url, options);
+        const data = await res.json();
+        consoleBox.innerText = `✅ Response Status: ${res.status} ${res.statusText}\n\n` + JSON.stringify(data, null, 2);
+      } catch (err) {
+        // When server is not started yet, show mock demonstration response
+        consoleBox.innerText = `ℹ️ Live Server at localhost:5000 is not running currently.\nDisplaying Simulated Express.js API Response:\n\n` + JSON.stringify(fallbackData, null, 2) + `\n\n💡 Tip: Run 'node server.js' in terminal to start the live Node.js server!`;
+      }
+    }
+  </script>
+</body>
+</html>

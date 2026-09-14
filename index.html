@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ganpat University - Web Tech & Full Stack Practicals Journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #eef2ff;
+      --secondary: #0ea5e9;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 6px 16px -2px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 24px -4px rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .header-banner {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+      color: white;
+      padding: 3.5rem 1.5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-banner::after {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .badge-top {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 0.4rem 1.2rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .header-banner h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .student-badge-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+      font-size: 0.95rem;
+    }
+
+    .student-badge-item {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .info-bar {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.75rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .info-bar-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .info-bar-item .icon {
+      font-size: 1.75rem;
+    }
+
+    .info-bar-item strong {
+      display: block;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    .info-bar-item span {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .section-heading {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .practicals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 1.75rem;
+      margin-bottom: 3rem;
+    }
+
+    .practical-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .practical-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .prac-no {
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.3rem 0.8rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .prac-no-react { background: #e0f2fe; color: #0369a1; }
+    .prac-no-express { background: #fef3c7; color: #92400e; }
+    .prac-no-mongo { background: #dcfce7; color: #15803d; }
+
+    .tech-tag {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .prac-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.6rem;
+      line-height: 1.4;
+    }
+
+    .prac-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+
+    .prac-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: auto;
+      border-top: 1px solid var(--border-color);
+      padding-top: 1.25rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      flex: 1;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-banner">
+    <span class="badge-top">Ganpat University &bull; Academic Journal</span>
+    <h1>Web Technology & Full Stack Practicals</h1>
+    <p>Complete set of 7 practical assignments covering React.js Frontend, Express.js REST APIs, and MongoDB Atlas Database Integration.</p>
+    
+    <div class="student-badge-bar">
+      <div class="student-badge-item">👤 <strong>Student:</strong> Soyab Saiyad</div>
+      <div class="student-badge-item">🎓 <strong>Enrollment No:</strong> 26084231040</div>
+      <div class="student-badge-item">🏛️ <strong>University:</strong> Ganpat University</div>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <div class="info-bar">
+      <div class="info-bar-item">
+        <span class="icon">⚛️</span>
+        <div>
+          <strong>Frontend Practicals (1–4)</strong>
+          <span>React 18 &bull; JSX &bull; Props &bull; State &bull; Router</span>
+        </div>
+      </div>
+      <div class="info-bar-item">
+        <span class="icon">🚀</span>
+        <div>
+          <strong>Backend Practicals (5–7)</strong>
+          <span>Express.js &bull; REST APIs &bull; Postman &bull; MongoDB Atlas</span>
+        </div>
+      </div>
+      <div class="info-bar-item">
+        <span class="icon">💻</span>
+        <div>
+          <strong>Running Environment</strong>
+          <span>Apache XAMPP / Node.js Localhost</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-heading"><span>📚</span> All 7 Practical Assignments</h2>
+
+    <div class="practicals-grid">
+      
+      <!-- Practical 1 -->
+      <div class="practical-card">
+        <div class="card-top">
+          <span class="prac-no prac-no-react">Practical 01</span>
+          <span class="tech-tag">React &bull; JSX &bull; Reusability</span>
+        </div>
+        <h3 class="prac-title">Functional Components, JSX & Reusability</h3>
+        <p class="prac-desc">
+          Build a React application utilizing Functional Components, JSX templating, and reusable UI components (Buttons, Badges, Cards, Course Cards).
+        </p>
+        <div class="prac-actions">
+          <a href="./Practical-01_React_Functional_Components/" class="btn btn-primary">
+            🚀 Open Practical 1 &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Practical 2 -->
+      <div class="practical-card">
+        <div class="card-top">
+          <span class="prac-no prac-no-react">Practical 02</span>
+          <span class="tech-tag">Props &bull; useState &bull; Events</span>
+        </div>
+        <h3 class="prac-title">Props, State Management & Event Handling</h3>
+        <p class="prac-desc">
+          Develop a React application implementing parent-child Props, useState hook, interactive Counter, Task Manager, and mouse/keyboard synthetic event handlers.
+        </p>
+        <div class="prac-actions">
+          <a href="./Practical-02_React_Props_State_Events/" class="btn btn-primary">
+            🚀 Open Practical 2 &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Practical 3 -->
+      <div class="practical-card">
+        <div class="card-top">
+          <span class="prac-no prac-no-react">Practical 03</span>
+          <span class="tech-tag">Forms &bull; Validation &bull; CRUD</span>
+        </div>
+        <h3 class="prac-title">Student Management System (Forms & Validation)</h3>
+        <p class="prac-desc">
+          Student Management System with Controlled Components, multi-field regex validations, and full student record CRUD (Add, Edit, Delete, Search & Filter).
+        </p>
+        <div class="prac-actions">
+          <a href="./Practical-03_React_Student_Management_Form_Validation/" class="btn btn-primary">
+            🚀 Open Practical 3 &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Practical 4 -->
+      <div class="practical-card">
+        <div class="card-top">
+          <span class="prac-no prac-no-react">Practical 04</span>
+          <span class="tech-tag">React Router &bull; SPA &bull; useParams</span>
+        </div>
+        <h3 class="prac-title">Single Page Application (SPA) with React Router</h3>
+        <p class="prac-desc">
+          Develop an SPA using React Router DOM for seamless navigation across Home, About, Courses Catalog, Dynamic Course Details, Contact, and 404 pages.
+        </p>
+        <div class="prac-actions">
+          <a href="./Practical-04_React_SPA_Router/" class="btn btn-primary">
+            🚀 Open Practical 4 &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Practical 5 -->
+      <div class="practical-card">
+        <div class="card-top">
+          <span class="prac-no prac-no-express">Practical 05</span>
+          <span class="tech-tag">Express.js &bull; Routing &bull; CRUD</span>
+        </div>
+        <h3 class="prac-title">Express.js Backend Server & CRUD Routing</h3>
+        <p class="prac-desc">
+          Backend server using Express.js implementing modular routing, request logging, error handling, and complete CRUD operations with test suite.
+        </p>
+        <div class="prac-actions">
+          <a href="./Practical-05_Express_CRUD_Routing/" class="btn btn-primary">
+            🚀 Open Practical 5 &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Practical 6 -->
+      <div class="practical-card">
+        <div class="card-top">
+          <span class="prac-no prac-no-express">Practical 06</span>
+          <span class="tech-tag">REST API &bull; Postman Testing</span>
+        </div>
+        <h3 class="prac-title">Student Records RESTful API with Postman Testing</h3>
+        <p class="prac-desc">
+          RESTful APIs for Student Records with input validation, department analytics, and 1-click importable Postman test collection with interactive console.
+        </p>
+        <div class="prac-actions">
+          <a href="./Practical-06_Express_Student_Records_REST_API/" class="btn btn-primary">
+            🚀 Open Practical 6 &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Practical 7 -->
+      <div class="practical-card">
+        <div class="card-top">
+          <span class="prac-no prac-no-mongo">Practical 07</span>
+          <span class="tech-tag">Mongoose &bull; MongoDB Atlas</span>
+        </div>
+        <h3 class="prac-title">Employee Management API with MongoDB Atlas</h3>
+        <p class="prac-desc">
+          Employee Management API integrating Express.js with MongoDB Atlas, Mongoose Schema validation, Aggregation metrics, and database seeder.
+        </p>
+        <div class="prac-actions">
+          <a href="./Practical-07_Express_MongoDB_Employee_Management/" class="btn btn-primary">
+            🚀 Open Practical 7 &rarr;
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p><strong>Ganpat University</strong> &bull; Department of Web Technology &bull; Practicals Journal</p>
+    <p style="margin-top: 0.4rem; color: #64748b; font-size: 0.85rem;">Submitted by: <strong>Soyab Saiyad</strong> (Enrollment No: 26084231040)</p>
+  </footer>
+
+</body>
+</html>

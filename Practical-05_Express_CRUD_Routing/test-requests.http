@@ -1,0 +1,55 @@
+### ==========================================
+### Practical 05: Express.js CRUD API Tests
+### ==========================================
+
+### 1. Server Welcome & Health Check
+GET http://localhost:5000/
+
+### 2. Get All Products
+GET http://localhost:5000/api/products
+
+### 3. Filter Products by Category (Electronics)
+GET http://localhost:5000/api/products?category=Electronics
+
+### 4. Search Products by Name Keyword (Mouse)
+GET http://localhost:5000/api/products?search=Mouse
+
+### 5. Get Single Product by ID (ID: 1)
+GET http://localhost:5000/api/products/1
+
+### 6. Get Non-Existing Product (Test 404 response)
+GET http://localhost:5000/api/products/999
+
+### 7. Create New Product (POST)
+POST http://localhost:5000/api/products
+Content-Type: application/json
+
+{
+  "name": "Ultra-Wide Gaming Monitor 34-inch",
+  "category": "Displays",
+  "price": 38999,
+  "stock": 12
+}
+
+### 8. Test Validation Error on Create (Missing Price)
+POST http://localhost:5000/api/products
+Content-Type: application/json
+
+{
+  "name": "Incomplete Product Item"
+}
+
+### 9. Update Existing Product (PUT)
+PUT http://localhost:5000/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Mechanical Keyboard RGB (Updated Pro Edition)",
+  "category": "Electronics",
+  "price": 3999,
+  "stock": 30,
+  "inStock": true
+}
+
+### 10. Delete Product by ID (DELETE)
+DELETE http://localhost:5000/api/products/2

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 04 - Single Page Application (React Router)</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --primary-light: #ede9fe;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius: 12px;
+      --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+    .app-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Navbar */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.9rem 2rem; display: flex; justify-content: space-between; align-items: center;
+    }
+    .nav-brand { font-size: 1.25rem; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+    .nav-links { display: flex; gap: 0.5rem; list-style: none; align-items: center; }
+    .nav-btn { background: none; border: none; font-family: inherit; font-size: 0.925rem; font-weight: 600; color: var(--text-muted); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+    .nav-btn:hover { color: var(--primary); background: var(--primary-light); }
+    .nav-btn.active { color: var(--primary-dark); background: var(--primary-light); font-weight: 700; }
+
+    .main-content { flex: 1; max-width: 1100px; width: 100%; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+    .hero-section { text-align: center; padding: 3rem 1rem; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border-radius: 18px; border: 1px solid #ddd6fe; margin-bottom: 2.5rem; }
+    .hero-title { font-size: 2.5rem; font-weight: 800; color: #4c1d95; margin-bottom: 0.75rem; }
+    .hero-subtitle { font-size: 1.1rem; color: #6d28d9; max-width: 650px; margin: 0 auto 1.5rem; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem; }
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; font-weight: 600; padding: 0.6rem 1.25rem; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: white; color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }
+    .badge-purple { background: var(--primary-light); color: var(--primary); }
+    .footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; text-align: center; font-size: 0.9rem; margin-top: auto; }
+  </style>
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const COURSES = [
+      { id: 'react', title: 'Modern React.js & Redux', desc: 'Master Functional Components, React Hooks, Context API and Single Page Routing.', duration: '8 Weeks', level: 'Intermediate', instructor: 'Dr. Sarah Jenkins' },
+      { id: 'node', title: 'Backend Engineering with Express', desc: 'Build scalable RESTful APIs with Node.js, Express, Middleware and Postman testing.', duration: '6 Weeks', level: 'Intermediate', instructor: 'Prof. Michael Chang' },
+      { id: 'mern', title: 'Full Stack MERN Architecture', desc: 'End-to-end full stack web platforms with MongoDB, Express, React, and Node.js.', duration: '12 Weeks', level: 'Advanced', instructor: 'Alex Rivera' }
+    ];
+
+    function App() {
+      const [currentRoute, setCurrentRoute] = useState('home');
+      const [selectedCourse, setSelectedCourse] = useState(null);
+
+      const navigateTo = (route, course = null) => {
+        setCurrentRoute(route);
+        setSelectedCourse(course);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      return (
+        <div className="app-wrapper">
+          {/* SPA Sticky Navbar */}
+          <nav className="navbar">
+            <div className="nav-brand" onClick={() => navigateTo('home')}>
+              <span>⚡</span> EduTech SPA (React Router)
+            </div>
+            <ul className="nav-links">
+              <li><button className={`nav-btn ${currentRoute === 'home' ? 'active' : ''}`} onClick={() => navigateTo('home')}>Home</button></li>
+              <li><button className={`nav-btn ${currentRoute === 'about' ? 'active' : ''}`} onClick={() => navigateTo('about')}>About</button></li>
+              <li><button className={`nav-btn ${currentRoute === 'courses' || currentRoute === 'course-details' ? 'active' : ''}`} onClick={() => navigateTo('courses')}>Courses</button></li>
+              <li><button className={`nav-btn ${currentRoute === 'contact' ? 'active' : ''}`} onClick={() => navigateTo('contact')}>Contact</button></li>
+            </ul>
+          </nav>
+
+          <main className="main-content">
+            {/* 1. HOME VIEW */}
+            {currentRoute === 'home' && (
+              <div>
+                <section className="hero-section">
+                  <span className="badge badge-purple" style={{ marginBottom: '1rem' }}>Practical 04 Demonstration</span>
+                  <h1 className="hero-title">Single Page Application with React Router</h1>
+                  <p className="hero-subtitle">Experience instant client-side routing, view transitions and dynamic routes without page reloads!</p>
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                    <button className="btn btn-primary" onClick={() => navigateTo('courses')}>Explore Courses Catalog →</button>
+                    <button className="btn btn-outline" onClick={() => navigateTo('about')}>About This SPA</button>
+                  </div>
+                </section>
+
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.25rem' }}>Featured Courses</h2>
+                <div className="grid-3">
+                  {COURSES.map(c => (
+                    <div key={c.id} className="card">
+                      <span className="badge badge-purple" style={{ marginBottom: '0.75rem', width: 'fit-content' }}>{c.level}</span>
+                      <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.5rem' }}>{c.title}</h3>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>{c.desc}</p>
+                      <button className="btn btn-primary btn-sm" onClick={() => navigateTo('course-details', c)}>View Details →</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 2. ABOUT VIEW */}
+            {currentRoute === 'about' && (
+              <div className="card">
+                <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '1rem' }}>About Single Page Applications</h1>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+                  In traditional multi-page apps, every click triggers a full browser reload. In React SPA, 
+                  the application runs entirely inside the client browser, dynamically rendering components on demand.
+                </p>
+                <div className="grid-2">
+                  <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '8px' }}>
+                    <h4>⚡ Zero Page Reloads</h4>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>Fast transitions with state preservation.</p>
+                  </div>
+                  <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '8px' }}>
+                    <h4>🔗 Dynamic URL Parameters</h4>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>Deep-linking to specific views like /courses/:id.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 3. COURSES CATALOG VIEW */}
+            {currentRoute === 'courses' && (
+              <div>
+                <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>All Technical Courses</h1>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Click "View Details" on any card to test dynamic parameter rendering.</p>
+                <div className="grid-3">
+                  {COURSES.map(c => (
+                    <div key={c.id} className="card">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <span className="badge badge-purple">{c.level}</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>⏱️ {c.duration}</span>
+                      </div>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, margin: '0.5rem 0' }}>{c.title}</h3>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>{c.desc}</p>
+                      <button className="btn btn-primary btn-sm" onClick={() => navigateTo('course-details', c)}>
+                        View Details & Curriculum →
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 4. COURSE DETAILS VIEW (Dynamic Route) */}
+            {currentRoute === 'course-details' && selectedCourse && (
+              <div className="card">
+                <button className="btn btn-outline btn-sm" onClick={() => navigateTo('courses')} style={{ marginBottom: '1.25rem' }}>
+                  ← Back to Courses Catalog
+                </button>
+                <div style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', color: 'white', padding: '2rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
+                  <span className="badge badge-purple" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>{selectedCourse.level}</span>
+                  <h1 style={{ fontSize: '2rem', margin: '0.75rem 0' }}>{selectedCourse.title}</h1>
+                  <p style={{ color: '#c7d2fe' }}>👨‍🏫 Instructor: {selectedCourse.instructor} &bull; ⏱️ Duration: {selectedCourse.duration}</p>
+                </div>
+                <p style={{ fontSize: '1rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>{selectedCourse.desc}</p>
+                <button className="btn btn-primary" onClick={() => alert(`Enrolled in ${selectedCourse.title}!`)}>
+                  🚀 Enroll in this Course
+                </button>
+              </div>
+            )}
+
+            {/* 5. CONTACT VIEW */}
+            {currentRoute === 'contact' && (
+              <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem' }}>Contact Department Support</h2>
+                <form onSubmit={e => { e.preventDefault(); alert('Message sent successfully!'); navigateTo('home'); }}>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.3rem' }}>Your Name</label>
+                    <input type="text" required placeholder="Name" style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.3rem' }}>Your Email</label>
+                    <input type="email" required placeholder="Email" style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.3rem' }}>Message</label>
+                    <textarea rows="3" required placeholder="Message" style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)', fontFamily: 'inherit' }}></textarea>
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Send Message</button>
+                </form>
+              </div>
+            )}
+          </main>
+
+          <footer className="footer">
+            <p><strong>Single Page Application (SPA) with React Router</strong> &bull; Practical 04</p>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

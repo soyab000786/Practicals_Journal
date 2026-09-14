@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 06 - Student Records RESTful API & Postman</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius: 12px;
+      --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+    .header { background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%); color: white; padding: 2.5rem 1.5rem; text-align: center; }
+    .header-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.35rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .header-title { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .header-subtitle { font-size: 1.05rem; color: #bae6fd; max-width: 650px; margin: 0 auto; }
+
+    .main-content { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    .endpoint-item { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.6rem; }
+    .method { font-family: 'Fira Code', monospace; font-weight: 700; font-size: 0.78rem; padding: 0.2rem 0.6rem; border-radius: 4px; }
+    .method-get { background: #dbeafe; color: #1e40af; }
+    .method-post { background: #dcfce7; color: #15803d; }
+    .method-delete { background: #fee2e2; color: #991b1b; }
+
+    .btn { padding: 0.4rem 0.85rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; border: none; cursor: pointer; background: var(--primary); color: white; }
+    .btn:hover { background: #0369a1; }
+
+    .terminal { background: #0f172a; color: #38bdf8; font-family: 'Fira Code', monospace; font-size: 0.85rem; padding: 1.25rem; border-radius: 8px; max-height: 350px; overflow-y: auto; white-space: pre-wrap; }
+    .footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; text-align: center; font-size: 0.9rem; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <span class="header-badge">Practical No. 06</span>
+    <h1 class="header-title">Student Records RESTful API with Postman Testing</h1>
+    <p class="header-subtitle">REST API Endpoints, Status Codes & Postman Test Collection Integration</p>
+  </header>
+
+  <main class="main-content">
+    
+    <div style="background: #e0f2fe; border-left: 4px solid var(--primary); padding: 1.25rem; border-radius: 0 8px 8px 0; margin-bottom: 2rem;">
+      <h3 style="color: var(--primary); font-size: 1.1rem; margin-bottom: 0.3rem;">📮 Postman Test Collection Available</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Import <code>Student_Records_API.postman_collection.json</code> in your Postman desktop client to execute the entire 11-step REST API test suite!
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 class="card-title">📡 RESTful Endpoints</h3>
+
+        <div class="endpoint-item">
+          <div><span class="method method-get">GET</span> <strong style="margin-left: 0.5rem;">/api/students</strong></div>
+          <button class="btn" onclick="testRest('GET', 'http://localhost:5000/api/students', null, mockStudents)">Test GET All</button>
+        </div>
+
+        <div class="endpoint-item">
+          <div><span class="method method-get">GET</span> <strong style="margin-left: 0.5rem;">/api/students/21CS001</strong></div>
+          <button class="btn" onclick="testRest('GET', 'http://localhost:5000/api/students/21CS001', null, mockStudents[0])">Test by Roll No</button>
+        </div>
+
+        <div class="endpoint-item">
+          <div><span class="method method-get">GET</span> <strong style="margin-left: 0.5rem;">/api/students/stats/overview</strong></div>
+          <button class="btn" onclick="testRest('GET', 'http://localhost:5000/api/students/stats/overview', null, { success: true, statistics: { totalStudents: 4, averageCgpa: 8.65, departmentDistribution: { 'Computer Engineering': 2, 'Information Technology': 1, 'AI & Data Science': 1 } } })">Test Stats API</button>
+        </div>
+
+        <div class="endpoint-item">
+          <div><span class="method method-post">POST</span> <strong style="margin-left: 0.5rem;">/api/students</strong></div>
+          <button class="btn" onclick="testRest('POST', 'http://localhost:5000/api/students', { rollNo: '21CS099', name: 'Karan Mehra', email: 'karan@college.edu', department: 'Computer Engineering', semester: 6, cgpa: 8.65 }, { success: true, message: 'Student record created successfully', data: { id: 5, rollNo: '21CS099', name: 'Karan Mehra' } })">Test POST Student</button>
+        </div>
+
+        <div class="endpoint-item">
+          <div><span class="method method-delete">DELETE</span> <strong style="margin-left: 0.5rem;">/api/students/21CS099</strong></div>
+          <button class="btn" onclick="testRest('DELETE', 'http://localhost:5000/api/students/21CS099', null, { success: true, message: 'Student record deleted successfully' })">Test DELETE</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">🖥️ Response Output</h3>
+        <div id="restConsole" class="terminal">// Click any endpoint to test responses...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p><strong>Web Technology Practicals Journal</strong> &bull; Practical 06</p>
+  </footer>
+
+  <script>
+    const mockStudents = [
+      { id: 1, rollNo: "21CS001", name: "Soyab Saiyad", email: "soyab@college.edu", department: "Computer Engineering", semester: 6, cgpa: 8.95 },
+      { id: 2, rollNo: "21IT042", name: "Aarav Patel", email: "aarav@college.edu", department: "Information Technology", semester: 6, cgpa: 9.12 }
+    ];
+
+    async function testRest(method, url, payload, fallbackData) {
+      const consoleBox = document.getElementById('restConsole');
+      consoleBox.innerText = `Connecting: [${method}] ${url}...\n`;
+
+      try {
+        const options = { method, headers: { 'Content-Type': 'application/json' } };
+        if (payload) options.body = JSON.stringify(payload);
+        const res = await fetch(url, options);
+        const data = await res.json();
+        consoleBox.innerText = `✅ Status: ${res.status}\n\n` + JSON.stringify(data, null, 2);
+      } catch (err) {
+        consoleBox.innerText = `ℹ️ Live Server at localhost:5000 is not started yet.\nSimulated Express REST API Response:\n\n` + JSON.stringify(fallbackData, null, 2) + `\n\n💡 Tip: Run 'node server.js' to start the live Node.js REST server!`;
+      }
+    }
+  </script>
+</body>
+</html>
