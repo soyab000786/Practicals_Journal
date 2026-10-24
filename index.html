@@ -3,425 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ganpat University - Web Tech & Full Stack Practicals Journal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>Ganpat University - Web Technology & MERN Stack Practicals</title>
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-dark: #3730a3;
-      --primary-light: #eef2ff;
-      --secondary: #0ea5e9;
-      --accent: #f59e0b;
-      --success: #10b981;
-      --bg-main: #f8fafc;
-      --bg-card: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --radius: 14px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 6px 16px -2px rgba(0,0,0,0.08);
-      --shadow-lg: 0 12px 24px -4px rgba(0,0,0,0.12);
+      --bg: #090d16;
+      --card-bg: rgba(22, 30, 49, 0.7);
+      --border: rgba(255, 255, 255, 0.1);
+      --primary: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --text: #f8fafc;
+      --muted: #94a3b8;
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 3rem; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      line-height: 1.6;
-    }
+    /* Hero Header */
+    .hero { background: linear-gradient(135deg, #1e1b4b, #172554, #042f2e); padding: 3rem 1.5rem 2.5rem; text-align: center; border-bottom: 1px solid var(--border); }
+    .uni-badge { display: inline-block; padding: 0.4rem 1rem; border-radius: 9999px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; margin-bottom: 1rem; }
+    h1 { font-size: 2.6rem; margin-bottom: 0.6rem; background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+    .hero p { color: #cbd5e1; font-size: 1.1rem; max-width: 800px; margin: 0 auto 1.5rem; }
+    
+    .meta-pills { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+    .pill { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); padding: 0.4rem 1rem; border-radius: 8px; font-size: 0.9rem; color: #e2e8f0; font-weight: 500; }
+    .pill strong { color: #38bdf8; }
 
-    .header-banner {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
-      color: white;
-      padding: 3.5rem 1.5rem 3rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
+    /* Main Container */
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+    .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; }
 
-    .header-banner::after {
-      content: '';
-      position: absolute;
-      top: -30%;
-      right: -10%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
-      border-radius: 50%;
-    }
+    /* Practical Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.25rem; }
+    
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; backdrop-filter: blur(12px); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s ease; position: relative; overflow: hidden; }
+    .card:hover { transform: translateY(-4px); border-color: rgba(96, 165, 250, 0.4); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4); }
+    .card-top { margin-bottom: 1rem; }
+    .card-num { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.6rem; }
+    
+    .tag-frontend { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .tag-backend { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .tag-db { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .tag-fullstack { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .tag-realtime { background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.4); }
+    .tag-miniproject { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
 
-    .badge-top {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(8px);
-      padding: 0.4rem 1.2rem;
-      border-radius: 9999px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
+    .card h3 { font-size: 1.15rem; color: #f8fafc; margin-bottom: 0.5rem; line-height: 1.35; }
+    .card p { color: var(--muted); font-size: 0.88rem; line-height: 1.45; margin-bottom: 1rem; }
+    
+    .tech-stack { font-size: 0.78rem; font-family: monospace; color: #94a3b8; background: rgba(0, 0, 0, 0.3); padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 1rem; border: 1px solid rgba(255, 255, 255, 0.05); }
 
-    .header-banner h1 {
-      font-size: 2.75rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
-    }
-
-    .student-badge-bar {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 1.25rem;
-      font-size: 0.95rem;
-    }
-
-    .student-badge-item {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      padding: 0.4rem 1rem;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .container {
-      max-width: 1250px;
-      margin: 0 auto;
-      padding: 2.5rem 1.5rem 4rem;
-    }
-
-    .info-bar {
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.75rem;
-      margin-bottom: 2.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .info-bar-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .info-bar-item .icon {
-      font-size: 1.75rem;
-    }
-
-    .info-bar-item strong {
-      display: block;
-      color: var(--text-main);
-      font-size: 0.95rem;
-    }
-
-    .info-bar-item span {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-
-    .section-heading {
-      font-size: 1.6rem;
-      font-weight: 800;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .practicals-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 1.75rem;
-      margin-bottom: 3rem;
-    }
-
-    .practical-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 1.75rem;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      transition: all 0.25s ease;
-      position: relative;
-    }
-
-    .practical-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--primary);
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .prac-no {
-      font-size: 0.8rem;
-      font-weight: 800;
-      padding: 0.3rem 0.8rem;
-      border-radius: 9999px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .prac-no-react { background: #e0f2fe; color: #0369a1; }
-    .prac-no-express { background: #fef3c7; color: #92400e; }
-    .prac-no-mongo { background: #dcfce7; color: #15803d; }
-
-    .tech-tag {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .prac-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 0.6rem;
-      line-height: 1.4;
-    }
-
-    .prac-desc {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin-bottom: 1.5rem;
-      flex: 1;
-    }
-
-    .prac-actions {
-      display: flex;
-      gap: 0.75rem;
-      margin-top: auto;
-      border-top: 1px solid var(--border-color);
-      padding-top: 1.25rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      padding: 0.65rem 1.25rem;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      flex: 1;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-    }
-
-    .footer {
-      background: #0f172a;
-      color: #94a3b8;
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      font-size: 0.9rem;
-    }
+    .btn-launch { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 0.65rem 1rem; border-radius: 6px; background: #2563eb; color: white; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+    .btn-launch:hover { background: #1d4ed8; }
   </style>
 </head>
 <body>
 
-  <header class="header-banner">
-    <span class="badge-top">Ganpat University &bull; Academic Journal</span>
-    <h1>Web Technology & Full Stack Practicals</h1>
-    <p>Complete set of 7 practical assignments covering React.js Frontend, Express.js REST APIs, and MongoDB Atlas Database Integration.</p>
-    
-    <div class="student-badge-bar">
-      <div class="student-badge-item">👤 <strong>Student:</strong> Soyab Saiyad</div>
-      <div class="student-badge-item">🎓 <strong>Enrollment No:</strong> 26084231040</div>
-      <div class="student-badge-item">🏛️ <strong>University:</strong> Ganpat University</div>
+  <div class="hero">
+    <div class="uni-badge">Ganpat University • M.Sc (CA & IT) SEM-1</div>
+    <h1>MERN Stack Development Practicals</h1>
+    <p>Complete official journal and source code repository (P21A1MSD) covering React.js Frontend, Express.js REST APIs, MongoDB Database, Socket.IO WebSockets, and Full-Stack Mini Project.</p>
+
+    <div class="meta-pills">
+      <div class="pill">Student: <strong>Saiyad Soyab</strong></div>
+      <div class="pill">Enrollment: <strong>26084231040</strong></div>
+      <div class="pill">Subject: <strong>P21A1MSD MERN Stack</strong></div>
+      <div class="pill">Academic Year: <strong>2026-2027</strong></div>
     </div>
-  </header>
+  </div>
 
   <div class="container">
-    
-    <div class="info-bar">
-      <div class="info-bar-item">
-        <span class="icon">⚛️</span>
-        <div>
-          <strong>Frontend Practicals (1–4)</strong>
-          <span>React 18 &bull; JSX &bull; Props &bull; State &bull; Router</span>
-        </div>
-      </div>
-      <div class="info-bar-item">
-        <span class="icon">🚀</span>
-        <div>
-          <strong>Backend Practicals (5–7)</strong>
-          <span>Express.js &bull; REST APIs &bull; Postman &bull; MongoDB Atlas</span>
-        </div>
-      </div>
-      <div class="info-bar-item">
-        <span class="icon">💻</span>
-        <div>
-          <strong>Running Environment</strong>
-          <span>Apache XAMPP / Node.js Localhost</span>
-        </div>
-      </div>
+    <div class="section-title">
+      <span>📚 All 13 Practical Assignments</span>
+      <span style="font-size: 0.9rem; color: #34d399; font-weight: 600;">100% Complete & Verified</span>
     </div>
 
-    <h2 class="section-heading"><span>📚</span> All 7 Practical Assignments</h2>
-
-    <div class="practicals-grid">
-      
+    <div class="grid">
       <!-- Practical 1 -->
-      <div class="practical-card">
+      <div class="card">
         <div class="card-top">
-          <span class="prac-no prac-no-react">Practical 01</span>
-          <span class="tech-tag">React &bull; JSX &bull; Reusability</span>
+          <span class="card-num tag-frontend">Practical 01 • React</span>
+          <h3>Functional Components, JSX & Reusability</h3>
+          <p>Build a React application using Functional Components, JSX templating, and reusable UI components (Buttons, Badges, Cards, CourseCards).</p>
+          <div class="tech-stack">React 18 • JSX • Reusable Components</div>
         </div>
-        <h3 class="prac-title">Functional Components, JSX & Reusability</h3>
-        <p class="prac-desc">
-          Build a React application utilizing Functional Components, JSX templating, and reusable UI components (Buttons, Badges, Cards, Course Cards).
-        </p>
-        <div class="prac-actions">
-          <a href="./Practical-01_React_Functional_Components/" class="btn btn-primary">
-            🚀 Open Practical 1 &rarr;
-          </a>
-        </div>
+        <a href="Practical-01_React_Functional_Components/" class="btn-launch">Launch Practical 01 →</a>
       </div>
 
       <!-- Practical 2 -->
-      <div class="practical-card">
+      <div class="card">
         <div class="card-top">
-          <span class="prac-no prac-no-react">Practical 02</span>
-          <span class="tech-tag">Props &bull; useState &bull; Events</span>
+          <span class="card-num tag-frontend">Practical 02 • React</span>
+          <h3>Props, State Management & Event Handling</h3>
+          <p>Develop a React application implementing Props flow, useState hook, interactive Counter, Task Manager, Live Profile, and mouse/keyboard synthetic event handlers.</p>
+          <div class="tech-stack">React • useState • Synthetic Events • Props</div>
         </div>
-        <h3 class="prac-title">Props, State Management & Event Handling</h3>
-        <p class="prac-desc">
-          Develop a React application implementing parent-child Props, useState hook, interactive Counter, Task Manager, and mouse/keyboard synthetic event handlers.
-        </p>
-        <div class="prac-actions">
-          <a href="./Practical-02_React_Props_State_Events/" class="btn btn-primary">
-            🚀 Open Practical 2 &rarr;
-          </a>
-        </div>
+        <a href="Practical-02_React_Props_State_Events/" class="btn-launch">Launch Practical 02 →</a>
       </div>
 
       <!-- Practical 3 -->
-      <div class="practical-card">
+      <div class="card">
         <div class="card-top">
-          <span class="prac-no prac-no-react">Practical 03</span>
-          <span class="tech-tag">Forms &bull; Validation &bull; CRUD</span>
+          <span class="card-num tag-frontend">Practical 03 • React</span>
+          <h3>Student Management (Forms & Validation)</h3>
+          <p>Create a Student Management System with Controlled Components, multi-field regex validations (email, phone, roll no), and local CRUD operations.</p>
+          <div class="tech-stack">Controlled Forms • Regex Validation • CRUD</div>
         </div>
-        <h3 class="prac-title">Student Management System (Forms & Validation)</h3>
-        <p class="prac-desc">
-          Student Management System with Controlled Components, multi-field regex validations, and full student record CRUD (Add, Edit, Delete, Search & Filter).
-        </p>
-        <div class="prac-actions">
-          <a href="./Practical-03_React_Student_Management_Form_Validation/" class="btn btn-primary">
-            🚀 Open Practical 3 &rarr;
-          </a>
-        </div>
+        <a href="Practical-03_React_Student_Management_Form_Validation/" class="btn-launch">Launch Practical 03 →</a>
       </div>
 
       <!-- Practical 4 -->
-      <div class="practical-card">
+      <div class="card">
         <div class="card-top">
-          <span class="prac-no prac-no-react">Practical 04</span>
-          <span class="tech-tag">React Router &bull; SPA &bull; useParams</span>
+          <span class="card-num tag-frontend">Practical 04 • React</span>
+          <h3>Single Page Application (SPA Router)</h3>
+          <p>Develop an SPA using React Router DOM with client-side navigation between Home, Courses, Course Details with useParams, About, and Contact pages.</p>
+          <div class="tech-stack">React Router DOM • SPA • Dynamic Routing</div>
         </div>
-        <h3 class="prac-title">Single Page Application (SPA) with React Router</h3>
-        <p class="prac-desc">
-          Develop an SPA using React Router DOM for seamless navigation across Home, About, Courses Catalog, Dynamic Course Details, Contact, and 404 pages.
-        </p>
-        <div class="prac-actions">
-          <a href="./Practical-04_React_SPA_Router/" class="btn btn-primary">
-            🚀 Open Practical 4 &rarr;
-          </a>
-        </div>
+        <a href="Practical-04_React_SPA_Router/" class="btn-launch">Launch Practical 04 →</a>
       </div>
 
       <!-- Practical 5 -->
-      <div class="practical-card">
+      <div class="card">
         <div class="card-top">
-          <span class="prac-no prac-no-express">Practical 05</span>
-          <span class="tech-tag">Express.js &bull; Routing &bull; CRUD</span>
+          <span class="card-num tag-backend">Practical 05 • Express</span>
+          <h3>Backend Server & CRUD Operations</h3>
+          <p>Create a backend server using Express.js implementing modular routing, custom logger/error middlewares, and complete RESTful CRUD operations.</p>
+          <div class="tech-stack">Node.js • Express.js • REST CRUD • Middleware</div>
         </div>
-        <h3 class="prac-title">Express.js Backend Server & CRUD Routing</h3>
-        <p class="prac-desc">
-          Backend server using Express.js implementing modular routing, request logging, error handling, and complete CRUD operations with test suite.
-        </p>
-        <div class="prac-actions">
-          <a href="./Practical-05_Express_CRUD_Routing/" class="btn btn-primary">
-            🚀 Open Practical 5 &rarr;
-          </a>
-        </div>
+        <a href="Practical-05_Express_CRUD_Routing/" class="btn-launch">Launch Practical 05 →</a>
       </div>
 
       <!-- Practical 6 -->
-      <div class="practical-card">
+      <div class="card">
         <div class="card-top">
-          <span class="prac-no prac-no-express">Practical 06</span>
-          <span class="tech-tag">REST API &bull; Postman Testing</span>
+          <span class="card-num tag-backend">Practical 06 • REST API</span>
+          <h3>Student Records REST API & Postman</h3>
+          <p>Build RESTful APIs for Student Records Management with HTTP status codes, validation middleware, and full Postman Test Collection integration.</p>
+          <div class="tech-stack">Express REST • Postman Collection • Status Codes</div>
         </div>
-        <h3 class="prac-title">Student Records RESTful API with Postman Testing</h3>
-        <p class="prac-desc">
-          RESTful APIs for Student Records with input validation, department analytics, and 1-click importable Postman test collection with interactive console.
-        </p>
-        <div class="prac-actions">
-          <a href="./Practical-06_Express_Student_Records_REST_API/" class="btn btn-primary">
-            🚀 Open Practical 6 &rarr;
-          </a>
-        </div>
+        <a href="Practical-06_Express_Student_Records_REST_API/" class="btn-launch">Launch Practical 06 →</a>
       </div>
 
       <!-- Practical 7 -->
-      <div class="practical-card">
+      <div class="card">
         <div class="card-top">
-          <span class="prac-no prac-no-mongo">Practical 07</span>
-          <span class="tech-tag">Mongoose &bull; MongoDB Atlas</span>
+          <span class="card-num tag-db">Practical 07 • MongoDB</span>
+          <h3>Employee Management with MongoDB Atlas</h3>
+          <p>Develop an Employee Management API integrating Express.js with MongoDB Atlas, Mongoose ODM, Schema Validation, and Aggregation analytics.</p>
+          <div class="tech-stack">MongoDB Atlas • Mongoose ODM • Aggregation</div>
         </div>
-        <h3 class="prac-title">Employee Management API with MongoDB Atlas</h3>
-        <p class="prac-desc">
-          Employee Management API integrating Express.js with MongoDB Atlas, Mongoose Schema validation, Aggregation metrics, and database seeder.
-        </p>
-        <div class="prac-actions">
-          <a href="./Practical-07_Express_MongoDB_Employee_Management/" class="btn btn-primary">
-            🚀 Open Practical 7 &rarr;
-          </a>
-        </div>
+        <a href="Practical-07_Express_MongoDB_Employee_Management/" class="btn-launch">Launch Practical 07 →</a>
       </div>
 
+      <!-- Practical 8 -->
+      <div class="card">
+        <div class="card-top">
+          <span class="card-num tag-backend">Practical 08 • Express</span>
+          <h3>Routing, Middleware & Request Handling</h3>
+          <p>Create a backend server with Express.js implementing custom logging, API-Key authentication headers, rate-limiting, and request handling (params, queries, body).</p>
+          <div class="tech-stack">Express.js • Custom Middleware Pipeline • Headers</div>
+        </div>
+        <a href="Practical-08_Express_Routing_Middleware_Request_Handling/" class="btn-launch">Launch Practical 08 →</a>
+      </div>
+
+      <!-- Practical 9 -->
+      <div class="card">
+        <div class="card-top">
+          <span class="card-num tag-db">Practical 09 • Multer & DB</span>
+          <h3>Multer File Upload & MongoDB Metadata</h3>
+          <p>Create a secure file upload module using Multer diskStorage with MIME type filtering, size limiting (5MB), and persist file metadata records in MongoDB.</p>
+          <div class="tech-stack">Multer • DiskStorage • MongoDB Metadata • Express</div>
+        </div>
+        <a href="Practical-09_Express_Multer_FileUpload_MongoDB/" class="btn-launch">Launch Practical 09 →</a>
+      </div>
+
+      <!-- Practical 10 -->
+      <div class="card">
+        <div class="card-top">
+          <span class="card-num tag-fullstack">Practical 10 • Full-Stack MERN</span>
+          <h3>Complete MERN Application Integration</h3>
+          <p>Develop a full-stack MERN application integrating React Frontend, Express Backend, Node.js runtime, and MongoDB Atlas database with live metrics.</p>
+          <div class="tech-stack">MERN Stack (React + Express + Node + MongoDB)</div>
+        </div>
+        <a href="Practical-10_MERN_FullStack_Integration/" class="btn-launch">Launch Practical 10 →</a>
+      </div>
+
+      <!-- Practical 11 -->
+      <div class="card">
+        <div class="card-top">
+          <span class="card-num tag-fullstack">Practical 11 • Auth & RBAC</span>
+          <h3>Blog Management System (Auth & RBAC)</h3>
+          <p>Create a Blog Management System with CRUD operations, JWT authentication, and Role-Based Access Control (Admin, Author, Reader) privilege segregation.</p>
+          <div class="tech-stack">JWT Authentication • bcryptjs • RBAC Permissions</div>
+        </div>
+        <a href="Practical-11_MERN_Blog_Auth_RBAC/" class="btn-launch">Launch Practical 11 →</a>
+      </div>
+
+      <!-- Practical 12 -->
+      <div class="card">
+        <div class="card-top">
+          <span class="card-num tag-realtime">Practical 12 • Real-Time</span>
+          <h3>Real-Time Chat Application with Socket.IO</h3>
+          <p>Develop a real-time chat application using Socket.IO WebSockets, React and Node.js with multiple chat channels, active presence, and typing indicators.</p>
+          <div class="tech-stack">Socket.IO • WebSockets • React • Real-Time Events</div>
+        </div>
+        <a href="Practical-12_MERN_RealTime_Chat_SocketIO/" class="btn-launch">Launch Practical 12 →</a>
+      </div>
+
+      <!-- Practical 13 -->
+      <div class="card">
+        <div class="card-top">
+          <span class="card-num tag-miniproject">Practical 13 • Mini Project</span>
+          <h3>Mini Project: Document Management System (DMS)</h3>
+          <p>Enterprise Full-Stack MERN DocuVault DMS: multi-departmental document archival, access permissions, version control, and real-time audit trail telemetry.</p>
+          <div class="tech-stack">Full-Stack MERN • Vault Security • Audit Trail</div>
+        </div>
+        <a href="Practical-13_Mini_Project_Document_Management_System/" class="btn-launch">Launch Practical 13 →</a>
+      </div>
     </div>
-
   </div>
-
-  <footer class="footer">
-    <p><strong>Ganpat University</strong> &bull; Department of Web Technology &bull; Practicals Journal</p>
-    <p style="margin-top: 0.4rem; color: #64748b; font-size: 0.85rem;">Submitted by: <strong>Soyab Saiyad</strong> (Enrollment No: 26084231040)</p>
-  </footer>
 
 </body>
 </html>
