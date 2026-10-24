@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 09 - Multer File Upload & MongoDB Metadata</title>
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --bg: #064e3b;
+      --card-bg: rgba(6, 78, 59, 0.4);
+      --border: rgba(255, 255, 255, 0.15);
+      --text: #f0fdf4;
+      --muted: #a7f3d0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #022c22; color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 1050px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .badge { display: inline-block; padding: 0.35rem 0.8rem; border-radius: 9999px; background: rgba(5, 150, 105, 0.25); border: 1px solid var(--primary); color: #6ee7b7; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #a7f3d0, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p.subtitle { color: var(--muted); font-size: 1rem; }
+    
+    .grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 1.5rem; }
+    @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+    
+    .card { background: rgba(6, 78, 59, 0.3); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; backdrop-filter: blur(12px); }
+    h2 { font-size: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; color: #a7f3d0; }
+    
+    /* Upload Box */
+    .drop-zone { border: 2px dashed rgba(52, 211, 153, 0.4); border-radius: 10px; padding: 2rem 1rem; text-align: center; background: rgba(2, 44, 34, 0.4); cursor: pointer; transition: all 0.2s; margin-bottom: 1rem; }
+    .drop-zone:hover { border-color: #34d399; background: rgba(5, 150, 105, 0.1); }
+    .drop-zone svg { width: 44px; height: 44px; fill: #34d399; margin-bottom: 0.5rem; }
+    input[type="file"] { display: none; }
+    
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.35rem; font-weight: 600; }
+    input, select { width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border); background: #022c22; color: #fff; font-size: 0.9rem; }
+    
+    button.submit-btn { width: 100%; background: #059669; color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    button.submit-btn:hover { background: #047857; }
+    
+    /* File Table */
+    .file-item { display: flex; justify-content: space-between; align-items: center; background: rgba(2, 44, 34, 0.6); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 0.75rem; }
+    .file-info { display: flex; flex-direction: column; gap: 0.2rem; }
+    .file-name { font-weight: 600; color: #f0fdf4; font-size: 0.95rem; }
+    .file-meta { font-size: 0.75rem; color: var(--muted); font-family: monospace; }
+    .file-actions { display: flex; gap: 0.5rem; }
+    .btn-action { padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: none; }
+    .btn-del { background: #ef4444; color: white; }
+    .btn-del:hover { background: #dc2626; }
+    
+    .terminal-box { background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; font-family: 'Consolas', monospace; font-size: 0.8rem; color: #34d399; margin-top: 1rem; max-height: 180px; overflow-y: auto; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="badge">PRACTICAL NO. 09</div>
+      <h1>Multer File Upload & MongoDB Metadata Storage</h1>
+      <p class="subtitle">Secure Disk Storage, MIME Type Filters, File Size Limiting & Mongoose Metadata Tracking</p>
+    </div>
+
+    <div class="grid">
+      <!-- Upload Panel -->
+      <div class="card">
+        <h2>📁 Upload New Document</h2>
+        <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+          <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+          <p id="fileNameDisplay" style="font-weight: 600;">Click or Drag & Drop File</p>
+          <p style="font-size: 0.75rem; color: var(--muted);">Supports: PDF, DOCX, PNG, JPG (Max 5 MB)</p>
+          <input type="file" id="fileInput" onchange="handleFileSelected(event)">
+        </div>
+
+        <div class="form-group">
+          <label>File Category</label>
+          <select id="fileCategory">
+            <option value="Document">Document (PDF/DOCX/TXT)</option>
+            <option value="Image">Image (PNG/JPG)</option>
+            <option value="Archive">Archive</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="fileDesc" placeholder="e.g. MERN Stack Semester Journal Draft">
+        </div>
+
+        <button class="submit-btn" onclick="submitUpload()">Upload File & Store Metadata</button>
+
+        <div id="uploadConsole" class="terminal-box">// MongoDB Metadata Pipeline Log
+Ready for file upload...</div>
+      </div>
+
+      <!-- Uploaded Files List -->
+      <div class="card">
+        <h2>📋 Stored MongoDB Metadata Records</h2>
+        <div id="fileListContainer">
+          <!-- Sample Item -->
+          <div class="file-item">
+            <div class="file-info">
+              <span class="file-name">MERN_Journal_Documentation.pdf</span>
+              <span class="file-meta">Size: 1.45 MB | MIME: application/pdf | Cat: Document</span>
+            </div>
+            <div class="file-actions">
+              <button class="btn-action btn-del" onclick="deleteFile(1)">Delete</button>
+            </div>
+          </div>
+          <div class="file-item">
+            <div class="file-info">
+              <span class="file-name">React_Architecture_Diagram.png</span>
+              <span class="file-meta">Size: 420.2 KB | MIME: image/png | Cat: Image</span>
+            </div>
+            <div class="file-actions">
+              <button class="btn-action btn-del" onclick="deleteFile(2)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedFile = null;
+    let storedFiles = [
+      { id: 1, originalName: "MERN_Journal_Documentation.pdf", sizeFormatted: "1.45 MB", mimeType: "application/pdf", category: "Document" },
+      { id: 2, originalName: "React_Architecture_Diagram.png", sizeFormatted: "420.2 KB", mimeType: "image/png", category: "Image" }
+    ];
+
+    function handleFileSelected(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Error: File exceeds maximum allowed size of 5MB!');
+          return;
+        }
+        selectedFile = file;
+        document.getElementById('fileNameDisplay').textContent = `${file.name} (${(file.size / (1024*1024)).toFixed(2)} MB)`;
+      }
+    }
+
+    function renderFileList() {
+      const container = document.getElementById('fileListContainer');
+      container.innerHTML = storedFiles.map(f => `
+        <div class="file-item">
+          <div class="file-info">
+            <span class="file-name">${f.originalName}</span>
+            <span class="file-meta">Size: ${f.sizeFormatted} | MIME: ${f.mimeType} | Cat: ${f.category}</span>
+          </div>
+          <div class="file-actions">
+            <button class="btn-action btn-del" onclick="deleteFile(${f.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function submitUpload() {
+      if (!selectedFile) {
+        alert('Please select a file first!');
+        return;
+      }
+
+      const desc = document.getElementById('fileDesc').value || 'Uploaded document';
+      const cat = document.getElementById('fileCategory').value;
+      const sizeFmt = (selectedFile.size / 1024).toFixed(1) + ' KB';
+
+      const newRecord = {
+        id: Date.now(),
+        originalName: selectedFile.name,
+        storedFileName: `${Date.now()}_${selectedFile.name}`,
+        sizeFormatted: sizeFmt,
+        mimeType: selectedFile.type || 'application/octet-stream',
+        category: cat,
+        description: desc,
+        uploadedBy: 'Saiyad Soyab (26084231040)',
+        uploadedAt: new Date().toISOString()
+      };
+
+      storedFiles.unshift(newRecord);
+      renderFileList();
+
+      document.getElementById('uploadConsole').textContent = `// File Metadata Stored in MongoDB:
+` + JSON.stringify(newRecord, null, 2);
+
+      selectedFile = null;
+      document.getElementById('fileNameDisplay').textContent = 'Click or Drag & Drop File';
+      document.getElementById('fileDesc').value = '';
+    }
+
+    function deleteFile(id) {
+      storedFiles = storedFiles.filter(f => f.id !== id);
+      renderFileList();
+      document.getElementById('uploadConsole').textContent = `// File record ID ${id} deleted from MongoDB and removed from disk.`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 10 - Complete MERN Application</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #0b0f19; color: #f1f5f9; min-height: 100vh; padding: 2rem 1rem; }
+    .mern-container { max-width: 1100px; margin: 0 auto; }
+    .mern-header { text-align: center; margin-bottom: 2rem; }
+    .badge { display: inline-block; padding: 0.35rem 0.8rem; border-radius: 9999px; background: rgba(14, 165, 233, 0.2); border: 1px solid #0ea5e9; color: #7dd3fc; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; }
+    h1 { font-size: 2.2rem; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.35rem; }
+    .mern-header p { color: #94a3b8; font-size: 1rem; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    @media (max-width: 768px) { .stats-row { grid-template-columns: 1fr; } }
+    .stat-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1.2rem; text-align: center; backdrop-filter: blur(10px); }
+    .stat-card h4 { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 0.3rem; }
+    .stat-card p { font-size: 1.6rem; font-weight: 700; color: #38bdf8; }
+
+    .main-layout { display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem; }
+    @media (max-width: 850px) { .main-layout { grid-template-columns: 1fr; } }
+    .form-card, .table-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; backdrop-filter: blur(12px); }
+    h3 { font-size: 1.2rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem; color: #e2e8f0; }
+
+    input, select { width: 100%; padding: 0.65rem 0.8rem; margin-bottom: 0.8rem; background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; color: #fff; font-size: 0.9rem; }
+    .btn-submit { width: 100%; background: #0284c7; color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-submit:hover { background: #0369a1; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 0.75rem 0.5rem; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    th { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; }
+    .cat-pill { padding: 0.2rem 0.5rem; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-size: 0.8rem; font-weight: 600; }
+    .btn-del { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; }
+    .btn-del:hover { background: #ef4444; color: white; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function App() {
+      const [products, setProducts] = useState([
+        { _id: '1', name: 'Logitech MX Master 3S', category: 'Accessories', price: 8999, stock: 14, sku: 'MOU-8999' },
+        { _id: '2', name: 'Dell UltraSharp 27" 4K', category: 'Electronics', price: 42999, stock: 6, sku: 'MON-4299' },
+        { _id: '3', name: 'Keychron K2 Mechanical Keyboard', category: 'Accessories', price: 7499, stock: 22, sku: 'KEY-7499' }
+      ]);
+      const [formData, setFormData] = useState({ name: '', category: 'Electronics', price: '', stock: '', sku: '' });
+
+      const handleAdd = (e) => {
+        e.preventDefault();
+        if (!formData.name || !formData.price) return;
+        const newItem = { ...formData, _id: Date.now().toString(), price: Number(formData.price), stock: Number(formData.stock) || 0 };
+        setProducts([newItem, ...products]);
+        setFormData({ name: '', category: 'Electronics', price: '', stock: '', sku: '' });
+      };
+
+      const handleDelete = (id) => {
+        setProducts(products.filter(p => p._id !== id));
+      };
+
+      const totalStock = products.reduce((acc, p) => acc + p.stock, 0);
+      const totalValuation = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
+
+      return (
+        <div className="mern-container">
+          <header className="mern-header">
+            <span className="badge">PRACTICAL NO. 10</span>
+            <h1>Complete MERN Application</h1>
+            <p>React Frontend + Express RESTful API + MongoDB Database Integration</p>
+          </header>
+
+          <div className="stats-row">
+            <div className="stat-card">
+              <h4>Total Catalog Items</h4>
+              <p>{products.length}</p>
+            </div>
+            <div className="stat-card">
+              <h4>Total Units in Stock</h4>
+              <p>{totalStock}</p>
+            </div>
+            <div className="stat-card">
+              <h4>Total Inventory Value</h4>
+              <p>₹{totalValuation.toLocaleString()}</p>
+            </div>
+          </div>
+
+          <div className="main-layout">
+            <form className="form-card" onSubmit={handleAdd}>
+              <h3>Add Product to MongoDB</h3>
+              <input type="text" placeholder="Product Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+              <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
+                <option>Electronics</option>
+                <option>Accessories</option>
+                <option>Furniture</option>
+                <option>Office Supplies</option>
+              </select>
+              <input type="number" placeholder="Price (₹)" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
+              <input type="number" placeholder="Initial Stock" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} required />
+              <button type="submit" className="btn-submit">+ Save to MongoDB Database</button>
+            </form>
+
+            <div className="table-card">
+              <h3>Live MERN Inventory Collection</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map(p => (
+                    <tr key={p._id}>
+                      <td><strong>{p.name}</strong></td>
+                      <td><span className="cat-pill">{p.category}</span></td>
+                      <td>₹{p.price.toLocaleString()}</td>
+                      <td>{p.stock} units</td>
+                      <td><button className="btn-del" onClick={() => handleDelete(p._id)}>Delete</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

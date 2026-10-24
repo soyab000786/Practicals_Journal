@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 11 - Blog Management System & RBAC</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #180d2b; color: #f5f3ff; min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 1050px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .badge { display: inline-block; padding: 0.35rem 0.8rem; border-radius: 9999px; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #d8b4fe; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; }
+    h1 { font-size: 2.2rem; background: linear-gradient(135deg, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.35rem; }
+    .header p { color: #a78bfa; font-size: 1rem; }
+
+    /* Role Switcher Toolbar */
+    .role-bar { background: rgba(46, 16, 101, 0.6); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 12px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; backdrop-filter: blur(10px); }
+    .role-options { display: flex; gap: 0.5rem; }
+    .role-btn { background: #3b0764; border: 1px solid rgba(168, 85, 247, 0.4); color: #d8b4fe; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+    .role-btn.active { background: #9333ea; color: #fff; border-color: #a855f7; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem; }
+    @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: rgba(46, 16, 101, 0.4); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px; padding: 1.5rem; backdrop-filter: blur(12px); }
+    h2 { font-size: 1.25rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(168, 85, 247, 0.2); padding-bottom: 0.5rem; color: #e9d5ff; }
+
+    input, textarea, select { width: 100%; padding: 0.65rem 0.8rem; margin-bottom: 0.8rem; background: #2e1065; border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 6px; color: #fff; font-size: 0.9rem; }
+    textarea { resize: vertical; min-height: 90px; }
+    .btn-create { width: 100%; background: #9333ea; color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-create:hover { background: #7e22ce; }
+    .btn-create:disabled { background: #4c1d95; color: #a78bfa; cursor: not-allowed; }
+
+    .post-card { background: rgba(30, 9, 68, 0.7); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 10px; padding: 1.2rem; margin-bottom: 1rem; }
+    .post-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .post-title { font-size: 1.1rem; font-weight: 700; color: #f5f3ff; }
+    .role-pill { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700; }
+    .role-Admin { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    .role-Author { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
+    .post-content { color: #d8b4fe; font-size: 0.9rem; margin-bottom: 0.8rem; line-height: 1.5; }
+    .btn-del { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+    .btn-del:hover { background: #ef4444; color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="badge">PRACTICAL NO. 11</div>
+      <h1>Blog Management System with RBAC</h1>
+      <p>Role-Based Access Control: Admin (Full Access), Author (Publish), Reader (Read Only)</p>
+    </div>
+
+    <!-- Active Role Switcher -->
+    <div class="role-bar">
+      <div>
+        <span style="font-size: 0.85rem; color: #a78bfa;">Current Authenticated Role:</span>
+        <strong id="currentRoleText" style="color: #f5f3ff; font-size: 1.1rem; margin-left: 0.5rem;">Admin</strong>
+      </div>
+      <div class="role-options">
+        <button class="role-btn active" onclick="setRole('Admin')">👑 Admin</button>
+        <button class="role-btn" onclick="setRole('Author')">✍️ Author</button>
+        <button class="role-btn" onclick="setRole('Reader')">👀 Reader</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Create Post Panel -->
+      <div class="card">
+        <h2>✍️ Create Blog Post</h2>
+        <p id="permNotice" style="font-size: 0.8rem; color: #a78bfa; margin-bottom: 1rem;">
+          Permissions: You can publish posts as <strong>Admin</strong>.
+        </p>
+
+        <form onsubmit="handlePublish(event)">
+          <input type="text" id="postTitle" placeholder="Blog Title" required>
+          <select id="postCategory">
+            <option>Engineering</option>
+            <option>Web Architecture</option>
+            <option>Security & RBAC</option>
+            <option>Cloud Databases</option>
+          </select>
+          <textarea id="postContent" placeholder="Write blog post content here..." required></textarea>
+          <button type="submit" id="btnPublish" class="btn-create">Publish Article</button>
+        </form>
+      </div>
+
+      <!-- Live Blog Stream -->
+      <div class="card">
+        <h2>📚 Published Articles Stream</h2>
+        <div id="postsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentRole = 'Admin';
+    let blogPosts = [
+      { id: 1, title: 'Getting Started with Full Stack MERN Architecture', content: 'Explore how React, Express, and MongoDB combine to create high performance enterprise web applications.', category: 'Engineering', authorName: 'Saiyad Soyab (26084231040)', authorRole: 'Admin' },
+      { id: 2, title: 'Understanding Role-Based Access Control (RBAC)', content: 'Protecting your REST APIs with JWT authentication tokens and granular permissions across multiple roles.', category: 'Security & RBAC', authorName: 'Aditya Sharma', authorRole: 'Author' }
+    ];
+
+    function setRole(role) {
+      currentRole = role;
+      document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.includes(role));
+      });
+      document.getElementById('currentRoleText').textContent = role;
+
+      const btnPublish = document.getElementById('btnPublish');
+      const notice = document.getElementById('permNotice');
+
+      if (role === 'Reader') {
+        btnPublish.disabled = true;
+        btnPublish.textContent = '❌ Readers Cannot Create Posts';
+        notice.innerHTML = '⚠️ Reader role has read-only access. Switch to <strong>Author</strong> or <strong>Admin</strong> to create.';
+      } else {
+        btnPublish.disabled = false;
+        btnPublish.textContent = 'Publish Article';
+        notice.innerHTML = `✅ Permissions: You can publish posts as <strong>${role}</strong>.`;
+      }
+
+      renderPosts();
+    }
+
+    function handlePublish(e) {
+      e.preventDefault();
+      if (currentRole === 'Reader') {
+        alert('Permission Denied: Readers cannot publish posts!');
+        return;
+      }
+
+      const title = document.getElementById('postTitle').value;
+      const category = document.getElementById('postCategory').value;
+      const content = document.getElementById('postContent').value;
+
+      const newPost = {
+        id: Date.now(),
+        title,
+        category,
+        content,
+        authorName: currentRole === 'Admin' ? 'Saiyad Soyab (Admin)' : 'Guest Author',
+        authorRole: currentRole
+      };
+
+      blogPosts.unshift(newPost);
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postContent').value = '';
+      renderPosts();
+    }
+
+    function handleDelete(id) {
+      if (currentRole !== 'Admin') {
+        alert('Permission Denied: Only users with the ADMIN role can delete blog posts!');
+        return;
+      }
+      blogPosts = blogPosts.filter(p => p.id !== id);
+      renderPosts();
+    }
+
+    function renderPosts() {
+      const container = document.getElementById('postsList');
+      container.innerHTML = blogPosts.map(p => `
+        <div class="post-card">
+          <div class="post-top">
+            <span class="post-title">${p.title}</span>
+            <span class="role-pill role-${p.authorRole}">${p.authorRole}</span>
+          </div>
+          <p class="post-content">${p.content}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #a78bfa;">
+            <span>By: <strong>${p.authorName}</strong> | ${p.category}</span>
+            ${currentRole === 'Admin' ? `<button class="btn-del" onclick="handleDelete(${p.id})">Delete (Admin)</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderPosts();
+  </script>
+</body>
+</html>
